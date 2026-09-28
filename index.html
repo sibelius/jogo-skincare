@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glow Shop ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rosa: #ff8fb8;
+    --rosa-escuro: #e35d92;
+    --lilas: #c9a7ff;
+    --menta: #9be7c9;
+    --creme: #fff6fa;
+    --texto: #5a2a48;
+    --card: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Fredoka', system-ui, sans-serif;
+    color: var(--texto);
+    background: linear-gradient(160deg, #ffe3ef 0%, #f3e6ff 50%, #e3fff4 100%);
+    min-height: 100vh;
+  }
+  .app { max-width: 960px; margin: 0 auto; padding: 20px 16px 60px; }
+  h1 { font-size: 2.6rem; margin: 10px 0 4px; text-align: center; color: var(--rosa-escuro); letter-spacing: 1px; }
+  h2 { margin: 0 0 12px; }
+  .sub { text-align: center; margin: 0 0 24px; opacity: .8; }
+  .hidden { display: none !important; }
+
+  .btn {
+    font-family: inherit; font-size: 1.1rem; font-weight: 600;
+    border: none; border-radius: 999px; padding: 14px 28px; cursor: pointer;
+    background: var(--rosa-escuro); color: white;
+    box-shadow: 0 5px 0 #b53f6f; transition: transform .1s, box-shadow .1s;
+  }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #b53f6f; }
+  .btn.lilas { background: #9a6bff; box-shadow: 0 5px 0 #6c43c9; }
+  .btn.branco { background: white; color: var(--texto); box-shadow: 0 5px 0 #e6c7d6; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  .menu { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: 30px; }
+  .menu .logo { font-size: 5rem; animation: flutua 3s ease-in-out infinite; }
+  @keyframes flutua { 50% { transform: translateY(-10px) rotate(-5deg); } }
+  .recorde { opacity: .8; }
+
+  .topo { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .pill { background: white; border-radius: 999px; padding: 8px 16px; font-weight: 600; box-shadow: 0 3px 0 #f0cfe0; }
+
+  .cliente {
+    display: flex; gap: 16px; align-items: center;
+    background: white; border-radius: 24px; padding: 18px; margin-bottom: 20px;
+    box-shadow: 0 6px 0 #f0cfe0;
+  }
+  .cliente .avatar { font-size: 4rem; animation: entra .5s ease-out; }
+  @keyframes entra { from { transform: translateX(-60px); opacity: 0; } }
+  .balao { background: var(--creme); border-radius: 18px; padding: 12px 16px; position: relative; flex: 1; font-size: 1.15rem; }
+  .balao b { color: var(--rosa-escuro); }
+  .balao small { display: block; margin-top: 4px; opacity: .7; }
+
+  .prateleira-titulo { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; }
+  .prateleira {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px;
+    background: #fbe9f2; border-radius: 24px; padding: 16px; border: 4px solid #f6cde0;
+  }
+  .produto {
+    background: white; border-radius: 18px; padding: 14px 10px; text-align: center; cursor: pointer;
+    border: 3px solid transparent; transition: transform .15s, border-color .15s; user-select: none;
+    box-shadow: 0 4px 0 #efd3e1; position: relative;
+  }
+  .produto:hover { transform: translateY(-4px) rotate(-1deg); }
+  .produto .emoji { font-size: 2.6rem; }
+  .produto .nome { font-weight: 600; font-size: .95rem; margin-top: 6px; }
+  .produto .marca { font-size: .8rem; opacity: .6; }
+  .produto.escolhido { border-color: var(--rosa-escuro); background: #fff0f6; }
+  .produto.escolhido::after { content: '🛍️'; position: absolute; top: -10px; right: -8px; font-size: 1.5rem; }
+  .produto.certo { border-color: #3cc98e; background: #eafff5; }
+  .produto.errado { border-color: #ff6b6b; background: #fff0f0; }
+  .produto.faltou { border-color: #ffb84d; border-style: dashed; }
+  .produto.travado { cursor: default; }
+  .produto.travado:hover { transform: none; }
+
+  .acoes { display: flex; justify-content: center; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+
+  .feedback { background: white; border-radius: 24px; padding: 18px; margin-top: 20px; box-shadow: 0 6px 0 #f0cfe0; }
+  .feedback h3 { margin: 0 0 8px; font-size: 1.4rem; }
+  .feedback ul { margin: 8px 0; padding-left: 20px; }
+  .feedback .dica { background: #eafff5; border-radius: 14px; padding: 10px 14px; margin-top: 10px; }
+
+  .necessidades { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+  .nec {
+    background: white; border-radius: 20px; padding: 18px 10px; text-align: center; cursor: pointer;
+    box-shadow: 0 5px 0 #efd3e1; transition: transform .15s; font-weight: 600; font-size: 1.05rem;
+  }
+  .nec:hover { transform: translateY(-4px); }
+  .nec .emoji { font-size: 2.8rem; display: block; margin-bottom: 6px; }
+
+  .guia-lista { display: grid; gap: 12px; margin-top: 16px; }
+  .guia-item { background: white; border-radius: 18px; padding: 14px; display: flex; gap: 14px; align-items: center; box-shadow: 0 4px 0 #efd3e1; }
+  .guia-item .emoji { font-size: 2.4rem; }
+  .guia-item p { margin: 4px 0 0; opacity: .85; }
+
+  .final { text-align: center; background: white; border-radius: 28px; padding: 30px 20px; box-shadow: 0 6px 0 #f0cfe0; }
+  .estrelas { font-size: 3.5rem; letter-spacing: 6px; margin: 10px 0; }
+
+  .aviso { font-size: .85rem; text-align: center; opacity: .7; margin-top: 30px; }
+
+  .confete { position: fixed; top: -20px; font-size: 1.6rem; pointer-events: none; animation: cai linear forwards; z-index: 99; }
+  @keyframes cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+  .pontos-voando { position: fixed; font-weight: 700; font-size: 1.6rem; pointer-events: none; animation: sobe 1s ease-out forwards; z-index: 99; }
+  @keyframes sobe { to { transform: translateY(-60px); opacity: 0; } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- MENU -->
+  <section id="tela-menu" class="menu">
+    <div class="logo">🧴✨</div>
+    <h1>Glow Shop</h1>
+    <p class="sub">Você é a dona da loja de skincare mais fofa da cidade!<br>Ajude cada cliente a escolher os produtos certos. 💖</p>
+    <button class="btn" onclick="comecarJogo()">🎮 Jogar</button>
+    <button class="btn lilas" onclick="abrirGuia()">📖 Guia de Produtos</button>
+    <div class="recorde" id="recorde"></div>
+  </section>
+
+  <!-- JOGO -->
+  <section id="tela-jogo" class="hidden">
+    <div class="topo">
+      <span class="pill" id="info-cliente">Cliente 1 de 5</span>
+      <span class="pill" id="info-pontos">⭐ 0 pontos</span>
+      <button class="btn branco" onclick="voltarMenu()">🏠 Menu</button>
+    </div>
+
+    <div class="cliente">
+      <div class="avatar" id="avatar">👧</div>
+      <div class="balao" id="balao"></div>
+    </div>
+
+    <div class="prateleira-titulo">
+      <h2>🛒 Prateleira</h2>
+      <span id="dica-escolha">Toque nos produtos que ajudam essa cliente!</span>
+    </div>
+    <div class="prateleira" id="prateleira"></div>
+
+    <div class="acoes">
+      <button class="btn" id="btn-entregar" onclick="entregar()">🛍️ Entregar sacolinha</button>
+      <button class="btn lilas hidden" id="btn-proximo" onclick="proximoCliente()">Próxima cliente ➡️</button>
+    </div>
+
+    <div class="feedback hidden" id="feedback"></div>
+  </section>
+
+  <!-- FIM -->
+  <section id="tela-fim" class="hidden">
+    <div class="final">
+      <h1 id="fim-titulo">Fim do dia! 🌙</h1>
+      <div class="estrelas" id="fim-estrelas"></div>
+      <p id="fim-texto" style="font-size:1.2rem"></p>
+      <div class="acoes">
+        <button class="btn" onclick="comecarJogo()">🔁 Jogar de novo</button>
+        <button class="btn branco" onclick="voltarMenu()">🏠 Menu</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUIA -->
+  <section id="tela-guia" class="hidden">
+    <div class="topo">
+      <h2 style="margin:0">📖 Guia de Produtos</h2>
+      <button class="btn branco" onclick="voltarMenu()">🏠 Menu</button>
+    </div>
+    <p>Qual é a sua necessidade? Toque para ver os produtos que ajudam!</p>
+    <div class="necessidades" id="lista-necessidades"></div>
+    <div id="guia-resultado"></div>
+  </section>
+
+  <p class="aviso">💡 Pele de criança é delicada! Sempre peça ajuda a um adulto antes de usar um produto novo e faça um teste em um pedacinho da pele.</p>
+</div>
+
+<script>
+// ====== NECESSIDADES ======
+const NECESSIDADES = {
+  espinhas: {
+    nome: 'Espinhas', emoji: '🔴',
+    frases: ['Socorro! Apareceu uma espinha bem no meu nariz! 😱', 'Minha testa está cheia de espinhas...', 'Tenho uma festa amanhã e acordei com uma espinha! 😭'],
+    dica: 'Lave o rosto de manhã e à noite e nunca esprema as espinhas!'
+  },
+  seca: {
+    nome: 'Pele seca', emoji: '🏜️',
+    frases: ['Minha pele está repuxando e descascando... 😣', 'Parece que meu rosto é um deserto!', 'Minha pele fica áspera no frio.'],
+    dica: 'Beba bastante água e passe hidratante logo depois de lavar o rosto.'
+  },
+  oleosa: {
+    nome: 'Pele oleosa', emoji: '💦',
+    frases: ['Meu rosto fica brilhando o dia todo! ✨😅', 'Minha pele parece uma frigideira de tão oleosa!', 'No meio da aula meu nariz já está brilhando.'],
+    dica: 'Pele oleosa também precisa de hidratante — só que leve, em gel!'
+  },
+  labios: {
+    nome: 'Lábios ressecados', emoji: '💋',
+    frases: ['Meus lábios estão rachados... 🥲', 'Minha boca fica seca toda hora!', 'Quero lábios macios e fofinhos!'],
+    dica: 'Não fique lambendo os lábios — isso deixa eles ainda mais secos!'
+  },
+  olhos: {
+    nome: 'Olhos cansados', emoji: '👀',
+    frases: ['Dormi pouco e estou com olheiras! 😴', 'Meus olhos estão inchados de manhã.', 'Estudei muito ontem e meus olhos estão cansados.'],
+    dica: 'Dormir bem é o melhor produto para os olhos! 💤'
+  },
+  sensivel: {
+    nome: 'Pele sensível', emoji: '🌹',
+    frases: ['Minha pele fica vermelhinha com tudo! 😳', 'Alguns produtos fazem minha pele arder...', 'Meu rosto fica irritado com facilidade.'],
+    dica: 'Prefira produtos sem perfume e teste antes num pedacinho da pele.'
+  },
+  sol: {
+    nome: 'Vou pegar sol', emoji: '☀️',
+    frases: ['Vou para a praia amanhã! 🏖️', 'Tenho aula de educação física no sol!', 'Vou passar o dia no parque!'],
+    dica: 'Passe protetor solar todo dia e reaplique a cada 2 horas no sol!'
+  },
+  make: {
+    nome: 'Look natural', emoji: '🌸',
+    frases: ['Quero ficar com as bochechas rosadinhas! 🥰', 'Vou tirar foto da escola e quero um look fofo!', 'Quero um brilho natural para o aniversário da minha amiga.'],
+    dica: 'Menos é mais! Um toque de cor já deixa tudo lindo. 💕'
+  }
+};
+
+// ====== PRODUTOS ======
+// "marca" fica vazia por enquanto — depois vamos colocar os produtos de verdade!
+const PRODUTOS = [
+  { id: 'limp-acne',   nome: 'Gel de limpeza anti-espinhas', emoji: '🧼', marca: '', ajuda: ['espinhas', 'oleosa'], desc: 'Limpa os poros e ajuda a secar as espinhas.' },
+  { id: 'patch',       nome: 'Adesivo de espinha',           emoji: '🩹', marca: '', ajuda: ['espinhas'],           desc: 'Um adesivinho que protege a espinha para ela sarar mais rápido.' },
+  { id: 'hid-gel',     nome: 'Hidratante em gel',            emoji: '💧', marca: '', ajuda: ['oleosa', 'espinhas'], desc: 'Hidrata sem deixar a pele oleosa.' },
+  { id: 'niacina',     nome: 'Sérum de niacinamida',         emoji: '🧪', marca: '', ajuda: ['oleosa', 'espinhas'], desc: 'Ajuda a controlar o brilho e deixa os poros menores.' },
+  { id: 'papel',       nome: 'Papel matificante',            emoji: '📄', marca: '', ajuda: ['oleosa'],             desc: 'Tira o brilho do rosto na hora!' },
+  { id: 'hid-creme',   nome: 'Creme hidratante',             emoji: '🫙', marca: '', ajuda: ['seca', 'sensivel'],   desc: 'Um creme bem cremoso que deixa a pele macia.' },
+  { id: 'hialuronico', nome: 'Sérum hidratante',             emoji: '💦', marca: '', ajuda: ['seca'],               desc: 'Puxa água para dentro da pele, como uma esponja!' },
+  { id: 'limp-suave',  nome: 'Limpador suave',               emoji: '🫧', marca: '', ajuda: ['seca', 'sensivel'],   desc: 'Limpa sem ressecar nem irritar.' },
+  { id: 'mask-labial', nome: 'Máscara labial noturna',       emoji: '🍓', marca: '', ajuda: ['labios'],             desc: 'Passe antes de dormir e acorde com lábios macios.' },
+  { id: 'balm',        nome: 'Bálsamo labial',               emoji: '💄', marca: '', ajuda: ['labios'],             desc: 'Protege os lábios durante o dia.' },
+  { id: 'eye-cream',   nome: 'Creme para os olhos',          emoji: '👁️', marca: '', ajuda: ['olhos'],              desc: 'Um creme delicado para a área dos olhos.' },
+  { id: 'eye-patch',   nome: 'Patches de gel para olhos',    emoji: '🧊', marca: '', ajuda: ['olhos'],              desc: 'Geladinhos que ajudam a desinchar os olhos.' },
+  { id: 'calmante',    nome: 'Creme calmante',               emoji: '🌿', marca: '', ajuda: ['sensivel'],           desc: 'Acalma a pele vermelhinha e irritada.' },
+  { id: 'fps',         nome: 'Protetor solar FPS 50',        emoji: '🧴', marca: '', ajuda: ['sol', 'espinhas', 'sensivel'], desc: 'Protege a pele do sol. O produto mais importante de todos!' },
+  { id: 'fps-labial',  nome: 'Protetor labial com FPS',      emoji: '🌞', marca: '', ajuda: ['sol', 'labios'],     desc: 'Protege os lábios do sol.' },
+  { id: 'chapeu',      nome: 'Chapéu de sol',                emoji: '👒', marca: '', ajuda: ['sol'],                desc: 'Sombra fofa para o rosto!' },
+  { id: 'blush',       nome: 'Blush líquido',                emoji: '🌷', marca: '', ajuda: ['make'],               desc: 'Deixa as bochechas rosadinhas.' },
+  { id: 'gloss',       nome: 'Gloss labial',                 emoji: '✨', marca: '', ajuda: ['make', 'labios'],     desc: 'Brilho lindo para os lábios.' },
+  { id: 'iluminador',  nome: 'Iluminador',                   emoji: '🌟', marca: '', ajuda: ['make'],               desc: 'Um brilho suave nas maçãs do rosto.' },
+];
+
+const CLIENTES = [
+  ['Luna', '👧'], ['Bia', '👩'], ['Sofia', '👱‍♀️'], ['Maya', '👩‍🦰'], ['Nina', '👧🏽'],
+  ['Alice', '👩🏻‍🦱'], ['Lara', '👧🏾'], ['Zoe', '👩🏼'], ['Duda', '🧒'], ['Mel', '👩🏽‍🦱'],
+  ['Theo', '👦'], ['Leo', '🧑🏻'], ['Vovó Rosa', '👵'], ['Tia Carla', '👩🏾']
+];
+
+const TOTAL_CLIENTES = 5;
+const TAMANHO_PRATELEIRA = 8;
+
+let estado = {};
+
+// ====== UTILIDADES ======
+const $ = id => document.getElementById(id);
+const embaralhar = arr => arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(v => v[1]);
+const sortear = arr => arr[Math.floor(Math.random() * arr.length)];
+
+function mostrarTela(nome) {
+  ['menu', 'jogo', 'fim', 'guia'].forEach(t => $('tela-' + t).classList.toggle('hidden', t !== nome));
+  window.scrollTo(0, 0);
+}
+
+function lerRecorde() {
+  try { return Number(localStorage.getItem('glowshop-recorde')) || 0; } catch { return 0; }
+}
+function salvarRecorde(p) {
+  try { localStorage.setItem('glowshop-recorde', p); } catch {}
+}
+function atualizarRecorde() {
+  const r = lerRecorde();
+  $('recorde').textContent = r ? `🏆 Seu recorde: ${r} pontos` : '';
+}
+
+// ====== SONS ======
+let audio;
+function tocar(notas) {
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    notas.forEach(([freq, inicio, dur]) => {
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.type = 'triangle'; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.15, audio.currentTime + inicio);
+      g.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + inicio + dur);
+      o.connect(g).connect(audio.destination);
+      o.start(audio.currentTime + inicio); o.stop(audio.currentTime + inicio + dur);
+    });
+  } catch {}
+}
+const somClique = () => tocar([[660, 0, .08]]);
+const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .25]]);
+const somErro   = () => tocar([[300, 0, .15], [220, .15, .25]]);
+
+function confete() {
+  const coisas = ['💖', '✨', '🌸', '⭐', '🧴', '💄', '🫧'];
+  for (let i = 0; i < 30; i++) {
+    const c = document.createElement('div');
+    c.className = 'confete';
+    c.textContent = sortear(coisas);
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.animationDuration = 2 + Math.random() * 2 + 's';
+    c.style.animationDelay = Math.random() * .5 + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5000);
+  }
+}
+
+function pontosVoando(el, texto, cor) {
+  const r = el.getBoundingClientRect();
+  const p = document.createElement('div');
+  p.className = 'pontos-voando';
+  p.textContent = texto; p.style.color = cor;
+  p.style.left = r.left + r.width / 2 - 20 + 'px'; p.style.top = r.top + 'px';
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), 1000);
+}
+
+// ====== JOGO ======
+function comecarJogo() {
+  const necs = embaralhar(Object.keys(NECESSIDADES)).slice(0, TOTAL_CLIENTES);
+  const clientes = embaralhar(CLIENTES).slice(0, TOTAL_CLIENTES);
+  estado = { rodada: 0, pontos: 0, acertosPerfeitos: 0, fila: necs.map((n, i) => ({ nec: n, cliente: clientes[i] })) };
+  mostrarTela('jogo');
+  montarCliente();
+}
+
+function montarCliente() {
+  const { nec, cliente } = estado.fila[estado.rodada];
+  const info = NECESSIDADES[nec];
+  estado.escolhidos = new Set();
+  estado.entregue = false;
+
+  const certos = PRODUTOS.filter(p => p.ajuda.includes(nec));
+  const outros = embaralhar(PRODUTOS.filter(p => !p.ajuda.includes(nec)));
+  const certosNaPrateleira = embaralhar(certos).slice(0, 4);
+  estado.prateleira = embaralhar([...certosNaPrateleira, ...outros.slice(0, TAMANHO_PRATELEIRA - certosNaPrateleira.length)]);
+  estado.certos = new Set(certosNaPrateleira.map(p => p.id));
+
+  $('info-cliente').textContent = `Cliente ${estado.rodada + 1} de ${TOTAL_CLIENTES}`;
+  $('info-pontos').textContent = `⭐ ${estado.pontos} pontos`;
+  $('avatar').textContent = cliente[1];
+  $('avatar').style.animation = 'none'; void $('avatar').offsetWidth; $('avatar').style.animation = '';
+  $('balao').innerHTML = `<b>${cliente[0]}:</b> ${sortear(info.frases)}<small>${info.emoji} Necessidade: ${info.nome}</small>`;
+  $('dica-escolha').textContent = `Escolha os ${certosNaPrateleira.length} produtos que ajudam!`;
+  $('feedback').classList.add('hidden');
+  $('btn-entregar').classList.remove('hidden');
+  $('btn-proximo').classList.add('hidden');
+  desenharPrateleira();
+}
+
+function desenharPrateleira() {
+  $('prateleira').innerHTML = '';
+  estado.prateleira.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'produto';
+    el.innerHTML = `<div class="emoji">${p.emoji}</div><div class="nome">${p.nome}</div>${p.marca ? `<div class="marca">${p.marca}</div>` : ''}`;
+    if (estado.entregue) {
+      el.classList.add('travado');
+      const escolhido = estado.escolhidos.has(p.id), certo = estado.certos.has(p.id);
+      if (escolhido && certo) el.classList.add('certo');
+      else if (escolhido && !certo) el.classList.add('errado');
+      else if (certo) el.classList.add('faltou');
+    } else {
+      if (estado.escolhidos.has(p.id)) el.classList.add('escolhido');
+      el.onclick = () => {
+        estado.escolhidos.has(p.id) ? estado.escolhidos.delete(p.id) : estado.escolhidos.add(p.id);
+        somClique();
+        desenharPrateleira();
+      };
+    }
+    $('prateleira').appendChild(el);
+  });
+}
+
+function entregar() {
+  if (estado.escolhidos.size === 0) {
+    $('dica-escolha').textContent = '👆 Escolha pelo menos um produto!';
+    return;
+  }
+  estado.entregue = true;
+  const { nec, cliente } = estado.fila[estado.rodada];
+  const info = NECESSIDADES[nec];
+
+  let acertos = 0, erros = 0;
+  estado.escolhidos.forEach(id => estado.certos.has(id) ? acertos++ : erros++);
+  const faltaram = estado.certos.size - acertos;
+  let ganho = acertos * 10 - erros * 5;
+  const perfeito = erros === 0 && faltaram === 0;
+  if (perfeito) { ganho += 10; estado.acertosPerfeitos++; }
+  estado.pontos = Math.max(0, estado.pontos + ganho);
+
+  desenharPrateleira();
+  $('info-pontos').textContent = `⭐ ${estado.pontos} pontos`;
+  pontosVoando($('info-pontos'), (ganho >= 0 ? '+' : '') + ganho, ganho >= 0 ? '#3cc98e' : '#ff6b6b');
+
+  let titulo;
+  if (perfeito) { titulo = `🥰 ${cliente[0]} amou! Perfeito!`; somAcerto(); confete(); }
+  else if (acertos > erros) { titulo = `😊 ${cliente[0]} gostou! Quase perfeito!`; somAcerto(); }
+  else { titulo = `🤔 Hmm... ${cliente[0]} ainda precisa de ajuda.`; somErro(); }
+
+  const certosLista = estado.prateleira.filter(p => estado.certos.has(p.id));
+  $('feedback').innerHTML = `
+    <h3>${titulo}</h3>
+    <p>✅ Acertos: ${acertos} &nbsp; ❌ Erros: ${erros} &nbsp; 🟠 Faltaram: ${faltaram}</p>
+    <p><b>Os produtos certos para ${info.nome.toLowerCase()} eram:</b></p>
+    <ul>${certosLista.map(p => `<li>${p.emoji} <b>${p.nome}</b> — ${p.desc}</li>`).join('')}</ul>
+    <div class="dica">💡 <b>Dica:</b> ${info.dica}</div>`;
+  $('feedback').classList.remove('hidden');
+  $('btn-entregar').classList.add('hidden');
+  $('btn-proximo').classList.remove('hidden');
+  $('btn-proximo').textContent = estado.rodada + 1 < TOTAL_CLIENTES ? 'Próxima cliente ➡️' : 'Fechar a loja 🌙';
+  $('feedback').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function proximoCliente() {
+  estado.rodada++;
+  if (estado.rodada < TOTAL_CLIENTES) { montarCliente(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  else fimDeJogo();
+}
+
+function fimDeJogo() {
+  const p = estado.pontos;
+  const estrelas = p >= 150 ? 3 : p >= 90 ? 2 : p >= 40 ? 1 : 0;
+  $('fim-estrelas').textContent = '⭐'.repeat(estrelas) + '☆'.repeat(3 - estrelas);
+  const recordeAntigo = lerRecorde();
+  let texto = `Você fez <b>${p} pontos</b> e deixou ${estado.acertosPerfeitos} de ${TOTAL_CLIENTES} clientes super felizes!`;
+  if (p > recordeAntigo) { salvarRecorde(p); texto += '<br>🏆 <b>NOVO RECORDE!</b>'; }
+  const frases = ['Continue praticando, você vai virar expert! 💪', 'Boa! Sua loja está ficando famosa! 🌷', 'Uau! Você é uma especialista em skincare! 💖', 'Incrível! Você é a rainha do skincare! 👑'];
+  texto += '<br>' + frases[estrelas];
+  $('fim-texto').innerHTML = texto;
+  mostrarTela('fim');
+  if (estrelas >= 2) { somAcerto(); confete(); }
+}
+
+function voltarMenu() { atualizarRecorde(); mostrarTela('menu'); }
+
+// ====== GUIA ======
+function abrirGuia() {
+  $('lista-necessidades').innerHTML = '';
+  Object.entries(NECESSIDADES).forEach(([id, n]) => {
+    const el = document.createElement('div');
+    el.className = 'nec';
+    el.innerHTML = `<span class="emoji">${n.emoji}</span>${n.nome}`;
+    el.onclick = () => { somClique(); mostrarGuia(id); };
+    $('lista-necessidades').appendChild(el);
+  });
+  $('guia-resultado').innerHTML = '';
+  mostrarTela('guia');
+}
+
+function mostrarGuia(id) {
+  const n = NECESSIDADES[id];
+  const lista = PRODUTOS.filter(p => p.ajuda.includes(id));
+  $('guia-resultado').innerHTML = `
+    <h2 style="margin-top:24px">${n.emoji} ${n.nome}</h2>
+    <div class="dica" style="background:#eafff5;border-radius:14px;padding:10px 14px">💡 ${n.dica}</div>
+    <div class="guia-lista">
+      ${lista.map(p => `
+        <div class="guia-item">
+          <div class="emoji">${p.emoji}</div>
+          <div><b>${p.nome}</b>${p.marca ? ` <span style="opacity:.6">· ${p.marca}</span>` : ''}<p>${p.desc}</p></div>
+        </div>`).join('')}
+    </div>`;
+  $('guia-resultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+atualizarRecorde();
+</script>
+</body>
+</html>
